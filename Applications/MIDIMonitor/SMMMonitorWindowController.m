@@ -613,6 +613,44 @@ static NSString * const SMMMessagesScrollPointY = @"messagesScrollPointY";
     }
 }
 
+-(void)tableView:(NSTableView *)tableView willDisplayCell:(nonnull id)cell forTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	NSTextFieldCell *theCell = (NSTextFieldCell *)cell;
+	theCell.font = [NSFont systemFontOfSize:[NSFont smallSystemFontSize]];
+	NSColor *textColor = [NSColor textColor];
+	SMMessage *message = self.displayedMessages[row];
+	if((message.messageType & SMMessageTypeAllVoiceMask) == 0) {
+		textColor = [NSColor lightGrayColor];
+	} else {
+		SMVoiceMessage *voiceMessage = (SMVoiceMessage *)message;
+		if((message.messageType & SMMessageTypeNoteOn) != 0) {
+			theCell.font = [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]];
+			textColor = [NSColor colorWithCalibratedHue:0.01 saturation:1.0 brightness:0.9 alpha:1.0];
+		} else if((message.messageType & SMMessageTypeNoteOff) != 0) {
+			theCell.font = [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]];
+			textColor = [NSColor colorWithCalibratedHue:0.01 saturation:0.5 brightness:0.5 alpha:1.0];
+		} else if((message.messageType & SMMessageTypeChannelPressure) != 0) {
+			textColor = [NSColor colorWithCalibratedHue:0.65 saturation:1.0 brightness:0.75 alpha:1.0];
+		} else if((message.messageType & SMMessageTypeControl) != 0) {
+			if(voiceMessage.dataByte1 == 11) {
+				textColor = [NSColor colorWithCalibratedHue:0.65 saturation:0.65 brightness:0.75 alpha:1.0];
+			} else if(voiceMessage.dataByte1 == 2) {
+				textColor = [NSColor colorWithCalibratedHue:0.65 saturation:0.65 brightness:0.5 alpha:1.0];
+			} else if(voiceMessage.dataByte1 == 1) {
+				textColor = [NSColor colorWithCalibratedHue:0.3 saturation:0.95 brightness:0.65 alpha:1.0];
+			} else if(voiceMessage.dataByte1 == 75) {
+				textColor = [NSColor colorWithCalibratedHue:0.85 saturation:0.95 brightness:0.75 alpha:1.0];
+			} else if(voiceMessage.dataByte1 == 76) {
+				textColor = [NSColor colorWithCalibratedHue:0.8 saturation:0.5 brightness:0.55 alpha:1.0];
+			}
+		} else if((message.messageType & SMMessageTypePitchWheel) != 0) {
+			textColor = [NSColor colorWithCalibratedHue:0.11 saturation:1.0 brightness:0.75 alpha:1.0];
+		}
+	}
+	
+	theCell.textColor = textColor;
+}
+
 #pragma mark Private
 
 - (SMMDocument *)midiDocument

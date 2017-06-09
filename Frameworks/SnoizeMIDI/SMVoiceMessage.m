@@ -81,6 +81,9 @@ fail:
             return SMMessageTypeNoteOff;
             
         case SMVoiceMessageStatusNoteOn:
+			if(dataBytes[1] == 0 && ![[NSUserDefaults standardUserDefaults] boolForKey:SMExpertModePreferenceKey]) {
+				return SMMessageTypeNoteOff;
+			}
             return SMMessageTypeNoteOn;
             
         case SMVoiceMessageStatusAftertouch:
